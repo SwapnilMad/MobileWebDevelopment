@@ -1,0 +1,135 @@
+<html>
+    <head>
+        <style>
+            html,body{
+                margin: 0;
+            }
+
+          
+        </style>
+    </head>
+    <body>
+        <canvas id="myCanvas" ></canvas>
+
+        <script>
+            window.addEventListener("deviceorientation", handleMotion, true);
+
+            var requestAnimationFrame = window.requestAnimationFrame || 
+									window.mozRequestAnimationFrame ||
+									window.webkitRequestAnimationFrame ||
+									window.msRequestAnimationFrame;
+		
+            var canvas = document.getElementById("myCanvas");
+            var size1=window.innerWidth;
+            var size2=window.innerHeight;
+            
+            let diff=50;
+            let change=10
+            var ctx = canvas.getContext("2d");
+            var x=0;
+            var y=0;
+            var temp1=0;
+            var temp2=0;
+            var eve=null;
+
+            function handleMotion(event){
+                if(Math.abs(Math.floor(event.gamma)-temp1)<90){                
+                    x=x+Math.floor(event.gamma)-temp1;             
+                }       
+                if(Math.abs(Math.floor(event.beta)-temp2)<90){                
+                    y=y+Math.floor(event.beta)-temp2
+                }
+                console.log(y,Math.floor(event.beta),temp2,x,Math.floor(event.gamma),temp1)
+                eve=event
+            }
+
+            
+            function draw(){
+                //canvas.width=window.innerWidth
+                //canvas.height=window.innerHeight
+                canvas.width = size1
+                canvas.height = size2
+                if(eve){
+                    ctx.clearRect(0,0,size1,size2)
+                    let min=0;
+                    let max=canvas.width>canvas.height?canvas.width:canvas.height;
+                    let halfx=(size1>>1)+x
+                    let halfy=(size2>>1)+y
+                    
+                    for(let i=0;i<size1-diff;i=i+diff){
+                        if(i%(diff<<1)==0){
+                            ctx.beginPath()
+                            ctx.moveTo(halfx, halfy);
+                            ctx.lineTo(i, 0);
+                            ctx.lineTo(i+diff, 0);
+                            ctx.fill();
+
+                            ctx.beginPath()
+                            ctx.moveTo(halfx, halfy);
+                            ctx.lineTo(i, size2);
+                            ctx.lineTo(i-diff, size2);
+                            ctx.fill();
+                        }
+                    }
+
+                    for(let i=diff;i<=size2;i=i+diff){
+                        if(i%(diff<<1)!=0){
+                            ctx.beginPath()
+                            ctx.moveTo(halfx, halfy);
+                            ctx.lineTo(0, i);
+                            ctx.lineTo(0, i+diff);
+                            ctx.fill();
+
+                            ctx.beginPath()
+                            ctx.moveTo(halfx, halfy);
+                            ctx.lineTo(size1, i);
+                            ctx.lineTo(size1, i-diff);
+                            ctx.fill();
+                            
+                        }
+                    }
+                
+                    ctx.translate(x,y)                   
+                  
+                    let hx=size1>>1
+                    let hy=size2>>1
+                    ctx.beginPath();
+                    ctx.arc(hx, hy, 50, 0, 2 * Math.PI);
+                    ctx.fillStyle = "#ff0080";
+                    ctx.fill();
+                
+                    for(let i=1;i<=3;i++){
+                        ctx.beginPath();
+                        ctx.arc(hx, hy, 100*i, 0, 2 * Math.PI);
+                        ctx.lineWidth = 5*i;
+                        if(i==1){
+                            ctx.strokeStyle='#ff00ff'
+                        }else if(i==2){
+                            ctx.strokeStyle='#d500ff'
+                        }else{
+                            ctx.strokeStyle='#bf00ff'
+                        }
+                        
+                        ctx.stroke();
+                        
+                        ctx.beginPath();
+                        ctx.arc(hx, hy, (100*i)+(5*i)-1, 0, 2 * Math.PI);
+                        ctx.lineWidth = 5*i;
+                        if(i==1){
+                            ctx.strokeStyle='#d500ff'
+                        }else{
+                            ctx.strokeStyle='#bf00ff'
+                        }
+                        ctx.stroke();
+                    }
+
+                    temp1=Math.floor(eve.gamma)
+                    temp2=Math.floor(eve.beta)
+                }
+                requestAnimationFrame(draw);
+            }
+
+            requestAnimationFrame(draw);            
+        </script>
+    </body>
+</html>
